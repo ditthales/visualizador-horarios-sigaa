@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Container, CssBaseline, ThemeProvider, createTheme, Box, Typography, Button, Stack, Snackbar, Alert } from '@mui/material'
 import WeeklySchedule from './components/WeeklySchedule'
 import ClassForm from './components/ClassForm'
@@ -37,7 +37,7 @@ const App: React.FC = () => {
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  // const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Salvar no localStorage sempre que as matérias mudarem
   useEffect(() => {
@@ -75,42 +75,42 @@ const App: React.FC = () => {
     setMaterias(materias.filter(materia => materia.id !== materiaId));
   };
 
-  const handleExport = () => {
-    const data = JSON.stringify(materias, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'grade-horaria.json';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
+  // const handleExport = () => {
+  //   const data = JSON.stringify(materias, null, 2);
+  //   const blob = new Blob([data], { type: 'application/json' });
+  //   const url = URL.createObjectURL(blob);
+  //   const a = document.createElement('a');
+  //   a.href = url;
+  //   a.download = 'grade-horaria.json';
+  //   document.body.appendChild(a);
+  //   a.click();
+  //   document.body.removeChild(a);
+  //   URL.revokeObjectURL(url);
+  // };
 
-  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const data = JSON.parse(e.target?.result as string);
-          setMaterias(data);
-          // O useEffect vai salvar automaticamente no localStorage
-        } catch (error) {
-          alert('Erro ao importar o arquivo. Verifique se o formato está correto.');
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
+  // const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = event.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = (e) => {
+  //       try {
+  //         const data = JSON.parse(e.target?.result as string);
+  //         setMaterias(data);
+  //         // O useEffect vai salvar automaticamente no localStorage
+  //       } catch (error) {
+  //         alert('Erro ao importar o arquivo. Verifique se o formato está correto.');
+  //       }
+  //     };
+  //     reader.readAsText(file);
+  //   }
+  // };
 
-  const handleClearStorage = () => {
-    if (window.confirm('Tem certeza que deseja limpar todos os dados salvos?')) {
-      localStorage.removeItem(STORAGE_KEY);
-      setMaterias([]);
-    }
-  };
+  // const handleClearStorage = () => {
+  //   if (window.confirm('Tem certeza que deseja limpar todos os dados salvos?')) {
+  //     localStorage.removeItem(STORAGE_KEY);
+  //     setMaterias([]);
+  //   }
+  // };
 
   const handleShare = () => {
     if (materias.length === 0) {
