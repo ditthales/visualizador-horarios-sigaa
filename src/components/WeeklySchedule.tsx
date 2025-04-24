@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, IconButton, Paper } from '@mui/material';
 import { Delete as DeleteIcon } from '@mui/icons-material';
-import { Materia, Aula, DIAS_SEMANA } from '../types';
+import { Materia, DIAS_SEMANA } from '../types';
 
 interface WeeklyScheduleProps {
   materias: Materia[];
