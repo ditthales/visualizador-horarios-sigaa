@@ -123,7 +123,7 @@ const App: React.FC = () => {
     }
 
     const encodedData = encodeGradeData(materias);
-    const url = `${window.location.origin}/${encodedData}`;
+    const url = `${window.location.origin}/grade/${encodedData}`;
     
     navigator.clipboard.writeText(url).then(() => {
       setSnackbar({
