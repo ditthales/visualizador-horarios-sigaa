@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Container, CssBaseline, ThemeProvider, createTheme, Box, Typography, Button, Stack } from '@mui/material'
+import { Container, CssBaseline, ThemeProvider, createTheme, Box, Typography, Button, Stack, Snackbar, Alert } from '@mui/material'
 import WeeklySchedule from './components/WeeklySchedule'
 import ClassForm from './components/ClassForm'
 import { Materia } from './types'
+import { encodeGradeData, decodeGradeData } from './utils/urlEncoder'
 
 const theme = createTheme({
   palette: {
@@ -35,12 +36,31 @@ const App: React.FC = () => {
     return savedData ? JSON.parse(savedData) : [];
   });
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' as 'success' | 'error' });
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Salvar no localStorage sempre que as matérias mudarem
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(materias));
   }, [materias]);
+
+  // Carregar dados do localStorage ou da URL
+  useEffect(() => {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    if (savedData) {
+      setMaterias(JSON.parse(savedData));
+    }
+
+    // Verificar se há dados na URL
+    const path = window.location.pathname;
+    if (path.length > 1) {
+      const encodedData = path.substring(1);
+      const decodedMaterias = decodeGradeData(encodedData);
+      if (decodedMaterias.length > 0) {
+        setMaterias(decodedMaterias);
+      }
+    }
+  }, []);
 
   const handleAddMateria = (novaMateria: Omit<Materia, 'id'>) => {
     const materiaComId = {
@@ -92,6 +112,34 @@ const App: React.FC = () => {
     }
   };
 
+  const handleShare = () => {
+    if (materias.length === 0) {
+      setSnackbar({
+        open: true,
+        message: 'Adicione matérias antes de compartilhar',
+        severity: 'error'
+      });
+      return;
+    }
+
+    const encodedData = encodeGradeData(materias);
+    const url = `${window.location.origin}/${encodedData}`;
+    
+    navigator.clipboard.writeText(url).then(() => {
+      setSnackbar({
+        open: true,
+        message: 'Link copiado para a área de transferência!',
+        severity: 'success'
+      });
+    }).catch(() => {
+      setSnackbar({
+        open: true,
+        message: 'Erro ao copiar link',
+        severity: 'error'
+      });
+    });
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -132,30 +180,9 @@ const App: React.FC = () => {
               <Button 
                 variant="outlined" 
                 color="primary"
-                onClick={handleExport}
+                onClick={handleShare}
               >
-                Exportar Grade
-              </Button>
-              <input
-                type="file"
-                accept=".json"
-                style={{ display: 'none' }}
-                ref={fileInputRef}
-                onChange={handleImport}
-              />
-              <Button 
-                variant="outlined" 
-                color="primary"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                Importar Grade
-              </Button>
-              <Button 
-                variant="outlined" 
-                color="error"
-                onClick={handleClearStorage}
-              >
-                Limpar Dados
+                Compartilhar
               </Button>
             </Stack>
             <WeeklySchedule 
@@ -169,6 +196,15 @@ const App: React.FC = () => {
             />
           </Box>
         </Container>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+        >
+          <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Box>
     </ThemeProvider>
   )
