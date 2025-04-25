@@ -53,11 +53,17 @@ const App: React.FC = () => {
 
     // Verificar se há dados na URL
     const path = window.location.pathname;
-    if (path.length > 1) {
-      const encodedData = path.substring(1);
+    if (path.startsWith('/grade/')) {
+      const encodedData = path.substring(7); // Remove '/grade/'
       const decodedMaterias = decodeGradeData(encodedData);
       if (decodedMaterias.length > 0) {
         setMaterias(decodedMaterias);
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Não foi possível carregar a grade compartilhada',
+          severity: 'error'
+        });
       }
     }
   }, []);
